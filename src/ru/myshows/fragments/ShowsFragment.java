@@ -1,5 +1,6 @@
 package ru.myshows.fragments;
 
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -12,6 +13,7 @@ import android.support.v4.app.ListFragment;
 import android.util.Log;
 import android.view.*;
 import android.widget.*;
+import com.actionbarsherlock.app.SherlockFragment;
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.assist.FailReason;
 import com.nostra13.universalimageloader.core.assist.ImageLoadingListener;
@@ -42,7 +44,7 @@ import java.util.*;
  * Time: 15:19:35
  * To change this template use File | Settings | File Templates.
  */
-public class ShowsFragment extends Fragment implements Taskable, Searchable, TaskListener<List<IShow>> {
+public class ShowsFragment extends SherlockFragment implements Taskable, Searchable, TaskListener<List<IShow>> {
 
     public static final int SHOWS_SEARCH = 1;
     public static final int SHOWS_TOP = 2;
@@ -61,6 +63,7 @@ public class ShowsFragment extends Fragment implements Taskable, Searchable, Tas
 
     public ShowsFragment(int action) {
         this.action = action;
+        Log.d("MyShows", "Shows fragment: CONSTRUCTOR!!!");
     }
 
 
@@ -68,6 +71,14 @@ public class ShowsFragment extends Fragment implements Taskable, Searchable, Tas
         this.action = action;
     }
 
+
+    @Override
+    public void onAttach(Activity activity) {
+        super.onAttach(activity);
+        if (activity.isFinishing())
+            Log.d("MyShows", "Shows fragment: ACTIVITY IS FINISHING");
+        Log.d("MyShows", "Shows fragment: On attach to activity ");
+    }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -82,6 +93,18 @@ public class ShowsFragment extends Fragment implements Taskable, Searchable, Tas
         list = (ListView) view.findViewById(R.id.shows_list);
         progress = (ProgressBar) view.findViewById(R.id.progress_shows);
         return view;
+    }
+
+    @Override
+    public void onActivityCreated(Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+        Log.d("MyShows", "Shows fragment: onActivityCreated");
+    }
+
+    @Override
+    public void onDetach() {
+        super.onDetach();
+        Log.d("MyShows", "Shows fragment: DDDDEEETACCHHHEEEDDDD!! FUCK YEAHH!!!");
     }
 
     @Override

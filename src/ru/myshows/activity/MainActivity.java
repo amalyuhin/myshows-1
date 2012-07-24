@@ -69,6 +69,7 @@ public class MainActivity extends SherlockFragmentActivity {
         indicator.setViewPager(pager);
         indicator.setTypeface(MyShows.font);
 
+
         indicator.setOnPageChangeListener(new ViewPager.OnPageChangeListener() {
             @Override
             public void onPageSelected(int position) {
@@ -265,7 +266,7 @@ public class MainActivity extends SherlockFragmentActivity {
 
     @Override
     protected void onDestroy() {
-        super.onStop();
+        super.onDestroy();
         Log.d("MyShows", "Main activity on DESTROY!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
     }
 }
