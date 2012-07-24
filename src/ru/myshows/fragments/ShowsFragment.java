@@ -70,7 +70,14 @@ public class ShowsFragment extends Fragment implements Taskable, Searchable, Tas
 
 
     @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        Log.d("MyShows", "Shows fragment: OnCreate");
+    }
+
+    @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        Log.d("MyShows", "Shows fragment: OnCreate View");
         View view = inflater.inflate(R.layout.shows, container, false);
         list = (ListView) view.findViewById(R.id.shows_list);
         progress = (ProgressBar) view.findViewById(R.id.progress_shows);

@@ -8,6 +8,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.util.Log;
+import ru.myshows.activity.MyShows;
 import ru.myshows.activity.R;
 import ru.myshows.util.Utils;
 
@@ -50,6 +51,7 @@ public abstract class BaseTask<T> extends AsyncTask<Object, Void, T> {
     @Override
     protected T doInBackground(Object... objects) {
         try {
+            Log.d("MyShows", "Task owner name = " + context.getClass().getName());
             return doWork(objects);
         } catch (Exception e) {
             e.printStackTrace();

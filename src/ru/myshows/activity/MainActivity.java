@@ -59,6 +59,8 @@ public class MainActivity extends SherlockFragmentActivity {
         setContentView(R.layout.main);
         PreferenceManager.setDefaultValues(this, R.xml.preferences, false);
 
+        Log.d("MyShows", "Main activity : OnCreate");
+
         adapter = new TabsAdapter(getSupportFragmentManager(), false);
         pager = (ViewPager) findViewById(R.id.pager);
         pager.setOffscreenPageLimit(6);
@@ -73,7 +75,10 @@ public class MainActivity extends SherlockFragmentActivity {
                 if (!MyShows.isLoggedIn)
                     return;
                 Fragment currentFragment = adapter.getItem(position);
-                ((Taskable) currentFragment).executeTask();
+                if (currentFragment.isAdded()){
+                    Log.d("MyShows", "Call task from indicator");
+                    ((Taskable) currentFragment).executeTask();
+                }
             }
 
             @Override
@@ -117,7 +122,6 @@ public class MainActivity extends SherlockFragmentActivity {
                 int position = pager.getCurrentItem();
                 if (!MyShows.isLoggedIn)
                     break;
-
                 Fragment currentFragment = adapter.getItem(position);
                 ((Taskable) currentFragment).executeUpdateTask();
 
@@ -172,6 +176,9 @@ public class MainActivity extends SherlockFragmentActivity {
 
     private void getPrivateTabs() {
 
+        Log.d("MyShows", "Adapter size = " + adapter.getCount());
+
+
         adapter.addFragment(new ShowsFragment(ShowsFragment.SHOWS_USER), getResources().getString(R.string.tab_shows_title));
         adapter.addFragment(new NewEpisodesFragment(), getResources().getString(R.string.tab_new));
         if (Settings.getBoolean(Settings.PREF_SHOW_NEXT))
@@ -186,6 +193,7 @@ public class MainActivity extends SherlockFragmentActivity {
         adapter.notifyDataSetChanged();
 
         // fire first task manually
+        Log.d("MyShows", "Call task from getTabs()");
         GetShowsTask task = new GetShowsTask(MainActivity.this, GetShowsTask.SHOWS_USER);
         task.setTaskListener((TaskListener) adapter.getItem(0));
         task.execute();
@@ -245,10 +253,19 @@ public class MainActivity extends SherlockFragmentActivity {
                 episodesTask.setTaskListener((NewEpisodesFragment) newEpisodesFragment);
                 episodesTask.execute();
             }
-
-
-
-
         }
+    }
+
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        Log.d("MyShows", "Main activity on STOP!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onStop();
+        Log.d("MyShows", "Main activity on DESTROY!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
     }
 }

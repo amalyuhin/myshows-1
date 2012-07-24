@@ -51,4 +51,9 @@ public class TabsAdapter extends FragmentPagerAdapter {
         return titles.get(position);
     }
 
+    public void clear(){
+        fragments = null;
+        titles = null;
+    }
+
 }
