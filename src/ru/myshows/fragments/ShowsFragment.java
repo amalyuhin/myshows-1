@@ -56,6 +56,7 @@ public class ShowsFragment extends SherlockFragment implements Taskable, Searcha
     private ListView list;
     private ProgressBar progress;
     private boolean isTaskExecuted = false;
+    private boolean isActivityCreated = false;
     private SectionedAdapter adapter;
 
     public ShowsFragment() {
@@ -77,17 +78,22 @@ public class ShowsFragment extends SherlockFragment implements Taskable, Searcha
         super.onAttach(activity);
         if (activity.isFinishing())
             Log.d("MyShows", "Shows fragment: ACTIVITY IS FINISHING");
-        Log.d("MyShows", "Shows fragment: On attach to activity ");
+        if (activity == null)
+            Log.d("MyShows", "Shows fragment: ACTIVITY IS NULL");
+        Log.d("MyShows", "Shows fragment: On attach to activity " + activity.getClass().getName());
     }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+       // setRetainInstance(false);
         Log.d("MyShows", "Shows fragment: OnCreate");
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        if (container == null)
+            Log.d("MyShows", "Shows fragment: Container is null!!!!!!!!!!!!!!!!!!!!!!!1");
         Log.d("MyShows", "Shows fragment: OnCreate View");
         View view = inflater.inflate(R.layout.shows, container, false);
         list = (ListView) view.findViewById(R.id.shows_list);
@@ -98,7 +104,14 @@ public class ShowsFragment extends SherlockFragment implements Taskable, Searcha
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
+        isActivityCreated = true;
         Log.d("MyShows", "Shows fragment: onActivityCreated");
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        Log.d("MyShows", "Shows fragment: onREsumeeee!!");
     }
 
     @Override

@@ -1,6 +1,7 @@
 package ru.myshows.activity;
 
 import android.app.AlertDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.res.Resources;
@@ -12,11 +13,13 @@ import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.ViewPager;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
 import android.view.ViewGroup;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import com.actionbarsherlock.app.ActionBar;
 import com.actionbarsherlock.app.SherlockFragmentActivity;
@@ -59,7 +62,6 @@ public class MainActivity extends SherlockFragmentActivity {
         setContentView(R.layout.main);
         PreferenceManager.setDefaultValues(this, R.xml.preferences, false);
 
-        Log.d("MyShows", "Main activity : OnCreate");
 
         adapter = new TabsAdapter(getSupportFragmentManager(), false);
         pager = (ViewPager) findViewById(R.id.pager);
@@ -69,17 +71,18 @@ public class MainActivity extends SherlockFragmentActivity {
         indicator.setViewPager(pager);
         indicator.setTypeface(MyShows.font);
 
-
         indicator.setOnPageChangeListener(new ViewPager.OnPageChangeListener() {
             @Override
             public void onPageSelected(int position) {
                 if (!MyShows.isLoggedIn)
                     return;
+
+
+
                 Fragment currentFragment = adapter.getItem(position);
-                if (currentFragment.isAdded()){
-                    Log.d("MyShows", "Call task from indicator");
-                    ((Taskable) currentFragment).executeTask();
-                }
+                Log.d("MyShows", "indicator" + currentFragment.getTag());
+
+                ((Taskable) currentFragment).executeTask();
             }
 
             @Override
@@ -91,6 +94,7 @@ public class MainActivity extends SherlockFragmentActivity {
             }
         });
 
+        Log.d("MyShows", "Main activity: OnCreate");
 
         getSupportActionBar().setDisplayShowHomeEnabled(true);
         getSupportActionBar().setDisplayShowTitleEnabled(true);
@@ -123,6 +127,7 @@ public class MainActivity extends SherlockFragmentActivity {
                 int position = pager.getCurrentItem();
                 if (!MyShows.isLoggedIn)
                     break;
+
                 Fragment currentFragment = adapter.getItem(position);
                 ((Taskable) currentFragment).executeUpdateTask();
 
@@ -134,6 +139,8 @@ public class MainActivity extends SherlockFragmentActivity {
                 search = (EditText) item.getActionView();
                 search.addTextChangedListener(filterTextWatcher);
                 search.requestFocus();
+                InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+                imm.toggleSoftInput(InputMethodManager.SHOW_FORCED, 0);
                 break;
             case 4:
                 final AlertDialog alert;
@@ -177,7 +184,16 @@ public class MainActivity extends SherlockFragmentActivity {
 
     private void getPrivateTabs() {
 
-        Log.d("MyShows", "Adapter size = " + adapter.getCount());
+//        getSupportFragmentManager().beginTransaction().add(new ShowsFragment(ShowsFragment.SHOWS_USER), getResources().getString(R.string.tab_shows_title)).commit();
+//        getSupportFragmentManager().beginTransaction().add(new NewEpisodesFragment(), getResources().getString(R.string.tab_new)).commit();
+//        if (Settings.getBoolean(Settings.PREF_SHOW_NEXT))
+//            getSupportFragmentManager().beginTransaction().add(new NextEpisodesFragment(), getResources().getString(R.string.tab_next)).commit();
+//        if (Settings.getBoolean(Settings.PREF_SHOW_NEWS))
+//            getSupportFragmentManager().beginTransaction().add(new NewsFragment(), getResources().getString(R.string.tab_news_title)).commit();
+//        if (Settings.getBoolean(Settings.PREF_SHOW_PROFILE))
+//            getSupportFragmentManager().beginTransaction().add(new ProfileFragment(), getResources().getString(R.string.tab_profile_title)).commit();
+//        getSupportFragmentManager().beginTransaction().add(new SearchFragment(), getResources().getString(R.string.tab_search_title)).commit();
+
 
 
         adapter.addFragment(new ShowsFragment(ShowsFragment.SHOWS_USER), getResources().getString(R.string.tab_shows_title));
@@ -193,11 +209,29 @@ public class MainActivity extends SherlockFragmentActivity {
         indicator.notifyDataSetChanged();
         adapter.notifyDataSetChanged();
 
-        // fire first task manually
-        Log.d("MyShows", "Call task from getTabs()");
-        GetShowsTask task = new GetShowsTask(MainActivity.this, GetShowsTask.SHOWS_USER);
-        task.setTaskListener((TaskListener) adapter.getItem(0));
-        task.execute();
+
+        ShowsFragment showsFragment = (ShowsFragment) adapter.getItem(0);
+        String fragmentTag = showsFragment.getTag();
+        Log.d("MyShows", "getTabs()" + fragmentTag);
+
+        if (fragmentTag == null){
+            finish();
+            startActivity(new Intent(this, MainActivity.class));
+        }
+        //Fragment f = getSupportFragmentManager().findFragmentByTag(getFragmentTag(0));
+
+        //if (fragmentTag != null) {
+            // fire first task manually
+            GetShowsTask task = new GetShowsTask(MainActivity.this, GetShowsTask.SHOWS_USER);
+            //ShowsFragment showsFragment = (ShowsFragment) adapter.getItem(0);
+            //task.setTaskListener((TaskListener)f);
+            task.setTaskListener(showsFragment);
+            task.execute();
+        //}
+    }
+
+    private String getFragmentTag(int pos){
+        return "android:switcher:"+pager.getId()+":"+pos;
     }
 
     private void getPublicTabs() {
@@ -254,19 +288,8 @@ public class MainActivity extends SherlockFragmentActivity {
                 episodesTask.setTaskListener((NewEpisodesFragment) newEpisodesFragment);
                 episodesTask.execute();
             }
+
+
         }
-    }
-
-
-    @Override
-    protected void onStop() {
-        super.onStop();
-        Log.d("MyShows", "Main activity on STOP!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
-    }
-
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        Log.d("MyShows", "Main activity on DESTROY!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
     }
 }

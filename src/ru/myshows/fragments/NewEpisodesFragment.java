@@ -81,7 +81,6 @@ public class NewEpisodesFragment extends SherlockFragment implements TaskListene
     public void onTaskComplete(List<Episode> result) {
         adapter = new MyExpandableListAdapter(result);
         list.setAdapter(adapter);
-
         progress.setVisibility(View.GONE);
         progress.setIndeterminate(false);
         list.setVisibility(View.VISIBLE);
