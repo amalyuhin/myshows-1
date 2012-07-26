@@ -60,7 +60,7 @@ public class ShowActivity extends SherlockFragmentActivity implements TaskListen
         super.onCreate(savedInstanceState);
         setContentView(R.layout.show_info);
 
-        tabsAdapter = new TabsAdapter(getSupportFragmentManager(), true);
+        tabsAdapter = new TabsAdapter(getSupportFragmentManager(), this, null);
         pager = (ViewPager) findViewById(R.id.pager);
         indicator = (TitlePageIndicator) findViewById(R.id.indicator);
         pager.setAdapter(tabsAdapter);
@@ -127,8 +127,8 @@ public class ShowActivity extends SherlockFragmentActivity implements TaskListen
         result.setWatchStatus(watchStatus);
         progress.setVisibility(View.GONE);
         indicatorLayout.setVisibility(View.VISIBLE);
-        tabsAdapter.addFragment(new ShowFragment(result, yoursRating), getResources().getString(R.string.tab_show));
-        tabsAdapter.addFragment(new EpisodesFragment(result), getResources().getString(R.string.tab_episodes));
+     //   tabsAdapter.addFragment(new ShowFragment(result, yoursRating), getResources().getString(R.string.tab_show));
+      //  tabsAdapter.addFragment(new EpisodesFragment(result), getResources().getString(R.string.tab_episodes));
         populateExternalLinkActions(result);
         indicator.notifyDataSetChanged();
         tabsAdapter.notifyDataSetChanged();

@@ -1,11 +1,14 @@
 package ru.myshows.adapters;
 
+import android.content.Context;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.app.FragmentTransaction;
 import android.util.Log;
 import android.view.ViewGroup;
+import ru.myshows.activity.R;
+import ru.myshows.fragments.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -19,57 +22,62 @@ import java.util.List;
  */
 public class TabsAdapter extends FragmentPagerAdapter {
 
-    private static final int TAB_SHOWS = 0;
-    private static final int TAB_NEW_EPISODES = 1;
-    private static final int TAB_NEWS = 2;
-    private static final int TAB_PROFILE = 3;
-    private static final int TAB_SEARCH = 4;
-    private static final int TAB_LOGIN = 5;
 
-  //  public List<Fragment> fragments;
-    public List<String> titles;
-    public boolean destroyItem;
-    FragmentManager fm;
+    public List<Integer> titles;
+    private Context context;
 
-    public TabsAdapter(FragmentManager fm, boolean destroyItem) {
+    public TabsAdapter(FragmentManager fm, Context context, List<Integer> titles) {
         super(fm);
-        this.destroyItem = destroyItem;
-        this.fm = fm;
+        this.titles = titles;
+        this.context = context;
     }
 
     @Override
     public Fragment getItem(int position) {
         //return fragments.get(position);
-        return fm.findFragmentByTag(titles.get(position));
+        Integer title = titles.get(position);
+        switch (title){
+            case R.string.tab_shows_title:
+                return new ShowsFragment(ShowsFragment.SHOWS_USER);
+            case R.string.tab_new:
+                return new NewEpisodesFragment();
+            case R.string.tab_next:
+                return new NextEpisodesFragment();
+            case R.string.tab_news_title:
+                return new NewsFragment();
+            case R.string.tab_profile_title:
+                return new ProfileFragment();
+            case R.string.tab_search_title:
+                return new SearchFragment();
+            case R.string.tab_show:
+                return new ShowFragment(null, null);
+            case R.string.tab_episodes:
+                return new EpisodesFragment(null);
+            case R.string.tab_login_title:
+                return new LoginFragment();
+        }
+        return null;
     }
 
     @Override
     public int getCount() {
-        if (titles == null) return 0;
+        if (titles == null || titles.isEmpty()) return 0;
         return titles.size();
 
-//        if (fragments == null) return 0;
-//        return fragments.size();
     }
 
-    public void addFragment(Fragment fragment, String title) {
-//        if (fragments == null)
-//            fragments = new ArrayList<Fragment>();
-        if (titles == null)
-            titles = new ArrayList<String>();
-//        fragments.add(fragment);
-        titles.add(title);
-        fm.beginTransaction().add(fragment,title).commit();
-    }
+
 
     @Override
     public CharSequence getPageTitle(int position) {
-        return titles.get(position);
+        return context.getResources().getString(titles.get(position));
     }
 
-    public void clear(){
-       // fragments = null;
-        titles = null;
+    @Override
+    public void destroyItem(ViewGroup container, int position, Object object) {
+        FragmentManager manager = ((Fragment) object).getFragmentManager();
+        FragmentTransaction trans = manager.beginTransaction();
+        trans.remove((Fragment) object);
+        trans.commit();
     }
-
 }

@@ -63,36 +63,6 @@ public class MainActivity extends SherlockFragmentActivity {
         PreferenceManager.setDefaultValues(this, R.xml.preferences, false);
 
 
-        adapter = new TabsAdapter(getSupportFragmentManager(), false);
-        pager = (ViewPager) findViewById(R.id.pager);
-        pager.setOffscreenPageLimit(6);
-        indicator = (TitlePageIndicator) findViewById(R.id.indicator);
-        pager.setAdapter(adapter);
-        indicator.setViewPager(pager);
-        indicator.setTypeface(MyShows.font);
-
-        indicator.setOnPageChangeListener(new ViewPager.OnPageChangeListener() {
-            @Override
-            public void onPageSelected(int position) {
-                if (!MyShows.isLoggedIn)
-                    return;
-
-
-
-                Fragment currentFragment = adapter.getItem(position);
-                Log.d("MyShows", "indicator" + currentFragment.getTag());
-
-                ((Taskable) currentFragment).executeTask();
-            }
-
-            @Override
-            public void onPageScrolled(int i, float v, int i1) {
-            }
-
-            @Override
-            public void onPageScrollStateChanged(int i) {
-            }
-        });
 
         Log.d("MyShows", "Main activity: OnCreate");
 
@@ -194,17 +164,43 @@ public class MainActivity extends SherlockFragmentActivity {
 //            getSupportFragmentManager().beginTransaction().add(new ProfileFragment(), getResources().getString(R.string.tab_profile_title)).commit();
 //        getSupportFragmentManager().beginTransaction().add(new SearchFragment(), getResources().getString(R.string.tab_search_title)).commit();
 
-
-
-        adapter.addFragment(new ShowsFragment(ShowsFragment.SHOWS_USER), getResources().getString(R.string.tab_shows_title));
-        adapter.addFragment(new NewEpisodesFragment(), getResources().getString(R.string.tab_new));
+        List<Integer> tabs = new ArrayList<Integer>();
+        tabs.add(R.string.tab_shows_title);
+        tabs.add(R.string.tab_new);
         if (Settings.getBoolean(Settings.PREF_SHOW_NEXT))
-            adapter.addFragment(new NextEpisodesFragment(), getResources().getString(R.string.tab_next));
+            tabs.add(R.string.tab_next);
         if (Settings.getBoolean(Settings.PREF_SHOW_NEWS))
-            adapter.addFragment(new NewsFragment(), getResources().getString(R.string.tab_news_title));
+            tabs.add(R.string.tab_news_title);
         if (Settings.getBoolean(Settings.PREF_SHOW_PROFILE))
-            adapter.addFragment(new ProfileFragment(), getResources().getString(R.string.tab_profile_title));
-        adapter.addFragment(new SearchFragment(), getResources().getString(R.string.tab_search_title));
+            tabs.add(R.string.tab_profile_title);
+        tabs.add(R.string.tab_search_title);
+
+        adapter = new TabsAdapter(getSupportFragmentManager(), this, tabs);
+        pager = (ViewPager) findViewById(R.id.pager);
+        pager.setOffscreenPageLimit(tabs.size());
+        indicator = (TitlePageIndicator) findViewById(R.id.indicator);
+        pager.setAdapter(adapter);
+        indicator.setViewPager(pager);
+        indicator.setTypeface(MyShows.font);
+
+        indicator.setOnPageChangeListener(new ViewPager.OnPageChangeListener() {
+            @Override
+            public void onPageSelected(int position) {
+                if (!MyShows.isLoggedIn)
+                    return;
+                Fragment f = getSupportFragmentManager().findFragmentByTag(getFragmentTag(position));
+                ((Taskable) f).executeTask();
+            }
+
+            @Override
+            public void onPageScrolled(int i, float v, int i1) {
+            }
+
+            @Override
+            public void onPageScrollStateChanged(int i) {
+            }
+        });
+
 
         indicator.notifyDataSetChanged();
         adapter.notifyDataSetChanged();
@@ -214,18 +210,18 @@ public class MainActivity extends SherlockFragmentActivity {
         String fragmentTag = showsFragment.getTag();
         Log.d("MyShows", "getTabs()" + fragmentTag);
 
-        if (fragmentTag == null){
-            finish();
-            startActivity(new Intent(this, MainActivity.class));
-        }
-        //Fragment f = getSupportFragmentManager().findFragmentByTag(getFragmentTag(0));
+//        if (fragmentTag == null){
+//            finish();
+//            startActivity(new Intent(this, MainActivity.class));
+//        }
+        Fragment f = getSupportFragmentManager().findFragmentByTag(getFragmentTag(0));
 
         //if (fragmentTag != null) {
             // fire first task manually
             GetShowsTask task = new GetShowsTask(MainActivity.this, GetShowsTask.SHOWS_USER);
             //ShowsFragment showsFragment = (ShowsFragment) adapter.getItem(0);
-            //task.setTaskListener((TaskListener)f);
-            task.setTaskListener(showsFragment);
+            task.setTaskListener((TaskListener)f);
+            //task.setTaskListener(showsFragment);
             task.execute();
         //}
     }
@@ -235,8 +231,18 @@ public class MainActivity extends SherlockFragmentActivity {
     }
 
     private void getPublicTabs() {
-        //adapter.addFragment(new SearchFragment(), getResources().getString(R.string.tab_search_title));
-        adapter.addFragment(new LoginFragment(), getResources().getString(R.string.tab_login_title));
+
+
+        List<Integer> tabs = new ArrayList<Integer>();
+        tabs.add(R.string.tab_login_title);
+        adapter = new TabsAdapter(getSupportFragmentManager(), this, tabs);
+        pager = (ViewPager) findViewById(R.id.pager);
+        pager.setOffscreenPageLimit(tabs.size());
+        indicator = (TitlePageIndicator) findViewById(R.id.indicator);
+        pager.setAdapter(adapter);
+        indicator.setViewPager(pager);
+        indicator.setTypeface(MyShows.font);
+
         indicator.notifyDataSetChanged();
         adapter.notifyDataSetChanged();
     }
